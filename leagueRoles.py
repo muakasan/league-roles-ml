@@ -2,9 +2,9 @@ import json, requests, dotenv, os
 dotenv.load_dotenv('.env')
 
 def itemListToVector(l, d):
-    v = [None]*len(d.key())
-    for i in l:
-        v[d[i]] = 1
+    v = [0]*len(d.keys())
+    for i in filter(lambda x: x!=0, l):
+        v[int(d[str(i)])] = 1
     return v        
 
 def main():
@@ -12,7 +12,7 @@ def main():
     jMatch = json.loads(jMatchStng)
 
     matches = jMatch['matches']
-
+    items = ''
     for m in matches:
         for p in m['participants']:
             lane = p['timeline']['lane']
@@ -29,8 +29,7 @@ def main():
 
     itemidToIndex = {itemsSR[i]: i for i in range(len(itemsSR))}
 
-
     print(len(itemsSR))
-
+    print(itemListToVector(items, itemidToIndex))
 if __name__ == '__main__':
     main()
