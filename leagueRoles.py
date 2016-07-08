@@ -1,25 +1,14 @@
-import json, requests, dotenv, os
+import json, requests, dotenv, os, codecs
 dotenv.load_dotenv('.env')
 
 def itemListToVector(l, d):
     v = [0]*len(d.keys())
-    for i in filter(lambda x: x!=0, l):
+    for i in filter(lambda x: str(x) in d, l): #Filters out zeroes because of empty slots, and other items which no longer exist
         v[int(d[str(i)])] = 1
-    return v        
+    return v
 
-def main():
-    jMatchStng = open('seed-files/matches1.json').read()
-    jMatch = json.loads(jMatchStng)
-
-    matches = jMatch['matches']
-    items = ''
-    for m in matches:
-        for p in m['participants']:
-            lane = p['timeline']['lane']
-            role = p['timeline']['role']
-            items = [ p['stats']['item'+str(i)] for i in range(1, 7) ]
-
-    #Items Corresponding to Summoner's Rift
+#Fetches from Riot API
+def getItemDictionary():
     rItems = requests.get('https://global.api.pvp.net/api/lol/static-data/na/v1.2/item', params = {'itemListData': 'maps', 'api_key': os.environ['API_KEY']})
     jItems = json.loads(rItems.text)
 
@@ -27,8 +16,55 @@ def main():
     for k, v in jItems['data'].items():
         itemsSR += [k] if v['maps']['11'] else [] #Map 11 is New Summoner's Rift
 
-    itemidToIndex = {itemsSR[i]: i for i in range(len(itemsSR))}
+    itemIdToIndex = {itemsSR[i]: i for i in range(len(itemsSR))}
+    return itemIdToIndex
 
-    print(itemListToVector(items, itemidToIndex))
+#Fetches from the matches_.json files
+def getMatchJson():
+    matches = []
+    for i in range(1, 11):
+        jMatchStng = codecs.open('seed-files/matches' + str(i) + '.json', 'r', encoding='latin-1').read()
+        #print(jMatchStng)
+        jMatch = json.loads(jMatchStng)
+        matches += jMatch['matches']
+    return matches
+
+def getRoleDictionary():
+    return {("TOP", "SOLO"): 0,
+            ("MID", "SOLO"): 1,
+            ("BOTTOM", "DUO_CARRY"): 2,
+            ("BOTTOM", "DUO_SUPPORT"): 3,
+            ("JUNGLE", "NONE"): 4
+            }
+
+def getRoleVectorForIndex(i):
+    v = [0]*5
+    v[i] = 1
+    return v
+
+def getRoleData(): 
+    l = []
+    itemDict = getItemDictionary()
+    roleDict = getRoleDictionary()
+    for m in getMatchJson():
+        for p in m['participants']:
+            lane = p['timeline']['lane']
+            role = p['timeline']['role']
+            items = [ p['stats']['item'+str(i)] for i in range(1, 7) ]
+            t = (lane, role)
+            if t in roleDict: #Discards nonstandard roles
+                l += (getRoleVectorForIndex(roleDict[t]), itemListToVector(items, itemDict))
+
+def main():
+    getRoleData()
+    '''
+    itemDict = getItemDictionary()
+    for m in getMatchJson()[:10]:
+        for p in m['participants']:
+            lane = p['timeline']['lane']
+            role = p['timeline']['role']
+            items = [ p['stats']['item'+str(i)] for i in range(1, 7) ]
+            print(lane, role, itemListToVector(items, itemDict))
+    '''
 if __name__ == '__main__':
     main()
