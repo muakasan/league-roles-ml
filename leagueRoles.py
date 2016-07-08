@@ -29,7 +29,6 @@ def main():
 
     itemidToIndex = {itemsSR[i]: i for i in range(len(itemsSR))}
 
-    print(len(itemsSR))
     print(itemListToVector(items, itemidToIndex))
 if __name__ == '__main__':
     main()
