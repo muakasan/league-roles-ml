@@ -31,8 +31,9 @@ def getMatchJson():
 
 def getRoleDictionary():
     return {("TOP", "SOLO"): 0,
-            ("MID", "SOLO"): 1,
+            ("MIDDLE", "SOLO"): 1,
             ("BOTTOM", "DUO_CARRY"): 2,
+            ("BOTTOM", "DUO"): 2,
             ("BOTTOM", "DUO_SUPPORT"): 3,
             ("JUNGLE", "NONE"): 4
             }
@@ -54,6 +55,8 @@ def getRoleData():
             t = (lane, role)
             if t in roleDict: #Discards nonstandard roles
                 l += (getRoleVectorForIndex(roleDict[t]), itemListToVector(items, itemDict))
+            else:
+                print(t)
 
 def main():
     getRoleData()
