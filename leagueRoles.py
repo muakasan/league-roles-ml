@@ -54,9 +54,12 @@ def getRoleData():
             items = [ p['stats']['item'+str(i)] for i in range(1, 7) ]
             t = (lane, role)
             if t in roleDict: #Discards nonstandard roles
-                l += (getRoleVectorForIndex(roleDict[t]), itemListToVector(items, itemDict))
+                l += [(getRoleVectorForIndex(roleDict[t]), itemListToVector(items, itemDict))]
             else:
-                print(t)
+                pass
+                #print(t)
+
+    return l
 
 def main():
     getRoleData()
