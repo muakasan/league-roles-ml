@@ -1,3 +1,5 @@
+#Modified from https://github.com/joelgrus/fizz-buzz-tensorflow
+
 import tensorflow as tf
 import numpy as np
 
@@ -5,33 +7,8 @@ from leagueRoles import getRoleData
 
 roleData = getRoleData()
 
-#print(roleData[:10])
-
-#itemidToIndex = []
-#itemData = []
-
-#numItemIds = len(itemIdToIndex)
 numItemIds = len(roleData[0][1])
 
-'''
-x = tf.placeholder(tf.int32, [None, numItemIds])
-
-W = tf.Variable(tf.zeros([numItemIds, 5]))
-b = tf.Variable(tf.zeros([5]))
-
-y = tf.nn.softmax(tf.matmul(x, W) + b)
-
-y_ = tf.placeholder(tf.int32, [None, 5])
-
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
-
-train_step = tf.train(GradientDescentOptimizer(0.5).minimize(cross_entropy))
-
-init = tf.initialize_all_variables()
-
-sess = tf.Session()
-sess.run(init)
-'''
 allX = np.array( list(map( lambda x: np.array(x[1]), roleData)))
 allY = np.array( list(map( lambda x: np.array(x[0]), roleData)))
 
@@ -68,9 +45,19 @@ train_op = tf.train.GradientDescentOptimizer(0.05).minimize(cost)
 
 predict_op = tf.argmax(py_x, 1)
 
+BATCH_SIZE = 128
+
 with tf.Session() as sess:
     tf.initialize_all_variables().run()
+    for epoch in range(2000):
+        p = np.random.permutation(range(len(trX)))
+        trX, trY = trX[p], trY[p]
 
+        for start in range(0, len(trX), BATCH_SIZE):
+            end = start + BATCH_SIZE
+            sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end]})
+    
+        print(epoch, np.mean(np.argmax(trY, axis=1) == sess.run(predict_op, feed_dict={X: trX, Y: trY})))
     sess.run(train_op, feed_dict={X: trX, Y: trY}) #is this problematic?
     print(np.mean(np.argmax(vY, axis=1) == sess.run(predict_op, feed_dict={X: vX, Y: vY})))
 
