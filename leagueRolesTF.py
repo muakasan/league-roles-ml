@@ -12,9 +12,6 @@ numItemIds = len(roleData[0][1])
 allX = np.array( list(map( lambda x: np.array(x[1]), roleData)))
 allY = np.array( list(map( lambda x: np.array(x[0]), roleData)))
 
-#allX = map( lambda x: np.array(x[1]), roleData)
-#allY = map( lambda x: np.array(x[0]), roleData)
-
 print(len(roleData))
 
 trX = allX[:9000]
@@ -58,6 +55,6 @@ with tf.Session() as sess:
             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end]})
         if epoch%100 == 0:
             print(epoch, np.mean(np.argmax(trY, axis=1) == sess.run(predict_op, feed_dict={X: trX, Y: trY})))
-    sess.run(train_op, feed_dict={X: trX, Y: trY}) #is this problematic?
+    sess.run(train_op, feed_dict={X: trX, Y: trY})
     print(np.mean(np.argmax(vY, axis=1) == sess.run(predict_op, feed_dict={X: vX, Y: vY})))
 
