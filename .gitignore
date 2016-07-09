@@ -1,3 +1,4 @@
 seed-files/*
 .env
 *.swp
+__pycache__/*
