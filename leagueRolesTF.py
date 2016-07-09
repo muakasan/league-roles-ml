@@ -17,11 +17,11 @@ allY = np.array( list(map( lambda x: np.array(x[0]), roleData)))
 
 print(len(roleData))
 
-trX = allX[:800]
-trY = allY[:800]
+trX = allX[:9000]
+trY = allY[:9000]
 
-vX = allX[800:]
-vY = allY[800:]
+vX = allX[9000:]
+vY = allY[9000:]
 
 def init_weights(shape):
     return tf.Variable(tf.random_normal(shape, stddev=0.01))
@@ -33,7 +33,7 @@ def model(X, w_h, w_o):
 X = tf.placeholder("float", [None, numItemIds])
 Y = tf.placeholder("float", [None, 5])
 
-NUM_HIDDEN = 100
+NUM_HIDDEN = 10
 
 w_h = init_weights([numItemIds, NUM_HIDDEN])
 w_o = init_weights([NUM_HIDDEN, 5])
@@ -49,15 +49,15 @@ BATCH_SIZE = 128
 
 with tf.Session() as sess:
     tf.initialize_all_variables().run()
-    for epoch in range(2000):
+    for epoch in range(3000):
         p = np.random.permutation(range(len(trX)))
         trX, trY = trX[p], trY[p]
 
         for start in range(0, len(trX), BATCH_SIZE):
             end = start + BATCH_SIZE
             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end]})
-    
-        print(epoch, np.mean(np.argmax(trY, axis=1) == sess.run(predict_op, feed_dict={X: trX, Y: trY})))
+        if epoch%100 == 0:
+            print(epoch, np.mean(np.argmax(trY, axis=1) == sess.run(predict_op, feed_dict={X: trX, Y: trY})))
     sess.run(train_op, feed_dict={X: trX, Y: trY}) #is this problematic?
     print(np.mean(np.argmax(vY, axis=1) == sess.run(predict_op, feed_dict={X: vX, Y: vY})))
 

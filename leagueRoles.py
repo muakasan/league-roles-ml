@@ -58,7 +58,6 @@ def getRoleData():
             else:
                 pass
                 #print(t)
-
     return l
 
 def main():
