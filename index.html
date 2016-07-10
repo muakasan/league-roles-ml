@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+        <title>League Roles ML</title>
         <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
@@ -18,12 +19,18 @@
                 var itemsNames = Object.keys(itemsJSON);
                 return itemsNames.filter(name => 
                     name.toLowerCase().includes(query.toLowerCase())
-                ).map(name => itemsJSON[name]);
+                ).map(name => [name, itemsJSON[name]]);
             }
 
-            function showItems(id){
+            function showItems(x){
+                var id = x[1];
+                var name = x[0];
+
                 var address = "http://ddragon.leagueoflegends.com/cdn/6.14.1/img/item/" + id + ".png";
-                return $("<img>", {src: address});
+                return $("<img>", {
+                    src: address,
+                    title: name
+                });
             }
 
             var text = $("#input")
