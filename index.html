@@ -17,12 +17,12 @@
             function itemSearch(query){
                 var itemsNames = Object.keys(itemsJSON);
                 return itemsNames.filter(name => 
-                    name.includes(query)
+                    name.toLowerCase().includes(query.toLowerCase())
                 ).map(name => itemsJSON[name]);
             }
 
             function showItems(id){
-                var address = "http://ddragon.leagueoflegends.com/cdn/5.2.1/img/item/" + id + ".png";
+                var address = "http://ddragon.leagueoflegends.com/cdn/6.14.1/img/item/" + id + ".png";
                 return $("<img>", {src: address});
             }
 
