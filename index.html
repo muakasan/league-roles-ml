@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js"></script>
+    </head>
+    <body>
+        <input id="input" type="text">
+        <div id="results">
+            
+        </div>
+
+        <script src=ItemsJSON.js></script> <!-- Imports a json called itemsJSON -->
+        <script>
+            var dict = ["cat", "attack", "cataract", "catch", "capture", "call"];
+            function itemSearch(query){
+                return dict.filter(function(word){
+                    return word.includes(query);
+                });
+            }
+
+            function showItems(i){
+                return i.toString() + ', '
+            }
+            var text = $("#input")
+            .asEventStream("keydown")
+            //.debounce(300)
+            .map(function(event){
+                return event.target.value;
+            })
+            .skipDuplicates()//.log();
+
+            var suggestions = text.flatMapLatest(itemSearch);
+            suggestions.onValue(function(results){
+                $("#results").html($.map(results, showItems))
+            });
+            
+        </script>
+    </body>
+</html>
