@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    </head>
+    <body>
+        <input id="input" type="text">
+        <div id="content">
+            
+        </div>
+
+        <script src=itemsJSON.js></script> <!-- Imports a json called itemsJSON -->
+        <script type="text/babel">
+            //is id allowed?
+            var ItemImage = React.createClass({
+                render: function(){
+                    var address = "http://ddragon.leagueoflegends.com/cdn/5.2.1/img/item/" + this.props.id + ".png";
+                    return (<img src={address}></img>);
+                }
+            });
+           
+            var ItemList = React.createClass({
+                render: function() { 
+                    var itemNodes = this.props.data.map(itemid => 
+                        (<ItemImage key={itemid} id={itemid}></ItemImage>)
+                    );
+                    return (
+                        <div className="itemList">
+                            {itemNodes}
+                        </div>
+                    );
+                }
+            });
+            var ItemBox = React.createClass({
+                getInitialState: function() {
+                    return {data: Object.keys(itemsJSON).map(item => itemsJSON[item])}; //Data is a list of ids
+                },
+                render: function(){
+                    return (
+                            <div className="itemBox">
+                                <ItemList data={this.state.data} />
+                            </div>
+                            ); 
+                }
+            });
+            ReactDOM.render(<ItemBox />, document.getElementById("content"))   
+        </script>
+    </body>
+</html>

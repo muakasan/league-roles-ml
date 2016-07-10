@@ -3,38 +3,40 @@
     <head>
         <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     </head>
     <body>
         <input id="input" type="text">
-        <div id="results">
+        <div id="content">
             
         </div>
 
-        <script src=ItemsJSON.js></script> <!-- Imports a json called itemsJSON -->
-        <script>
-            var dict = ["cat", "attack", "cataract", "catch", "capture", "call"];
+        <script src=itemsJSON.js></script> <!-- Imports a json called itemsJSON -->
+        <script type="text/babel">
             function itemSearch(query){
-                return dict.filter(function(word){
-                    return word.includes(query);
-                });
+                var itemsNames = Object.keys(itemsJSON);
+                return itemsNames.filter(name => 
+                    name.includes(query)
+                ).map(name => itemsJSON[name]);
             }
 
-            function showItems(i){
-                return i.toString() + ', '
+            function showItems(id){
+                var address = "http://ddragon.leagueoflegends.com/cdn/5.2.1/img/item/" + id + ".png";
+                return $("<img>", {src: address});
             }
+
             var text = $("#input")
-            .asEventStream("keydown")
-            //.debounce(300)
-            .map(function(event){
-                return event.target.value;
-            })
-            .skipDuplicates()//.log();
+            .asEventStream("keyup")
+            .map(event => event.target.value)
+            .skipDuplicates()
 
             var suggestions = text.flatMapLatest(itemSearch);
-            suggestions.onValue(function(results){
-                $("#results").html($.map(results, showItems))
+            suggestions.onValue(results => {
+                $("#content").html($.map(results, showItems))
             });
-            
+
+            $("#input").trigger("keyup")
+
         </script>
     </body>
 </html>
