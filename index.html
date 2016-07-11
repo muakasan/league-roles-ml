@@ -7,8 +7,8 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     </head>
     <body>
+        <div id="item-list" style="height:64px"></div>
         <input id="input" type="text">
-        <div id="item-list"></div>
         <div id="content">
             
         </div>
@@ -49,23 +49,25 @@
 
             function ItemView(contentsProperty){
                 function updateContentView(newContents){
-                   $("#itemsList").html($.map(newContents, showItems)); 
+                   $("#item-list").html($.map(newContents, showItems)); 
                 }
                 contentsProperty.onValue(updateContentView);
             }
-            /*
-            function NewItemView(){
-                var newItemClick = $button.asEventStream("click");
-            */
+
+            function spliced(l, index)
+            {
+                return l.slice(0, index).concat(l.slice(index+1)) 
+            }
+
             function ItemList(initialContents, addItem, removeItem){
                 return Bacon.update(initialContents,
-                    addItem, (contents, newItem) => content.concat(newItem),
-                    removeItem, (contents, removedItemIndex) => contents.slice(removedItemIndex)
+                    addItem, (contents, newItem) => contents.length < 6 ? contents.concat([newItem]) : contents,
+                    removeItem, (contents, removedItemIndex) => spliced(contents, removedItemIndex) 
                 )
             }
             
             var removeItemStream = $("#item-list").asEventStream("click", "img").map(function(e){
-                return $(e.currentTarget).attr("index")
+                return $(e.currentTarget).index()
             })
             
             var newItemStream = $("#content").asEventStream("click", "img").map(function(e){
