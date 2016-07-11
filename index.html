@@ -8,19 +8,18 @@
     </head>
     <body>
         <div id="item-list" style="height:64px"></div>
+        <button id="submit-button">Submit</button>
         <input id="input" type="text">
-        <div id="content">
-            
-        </div>
+        <div id="content"></div>
 
         <script src=itemsJSON.js></script> <!-- Imports a json called itemsJSON -->
         <script type="text/babel">
         
             function itemSearch(query){
-                var itemsNames = Object.keys(itemsJSON);
+                var itemsNames = Object.keys(itemsJSON)
                 return itemsNames.filter(name => 
                     name.toLowerCase().includes(query.toLowerCase())
-                ).map(name => [name, itemsJSON[name]]);
+                ).map(name => [name, itemsJSON[name]])
             }
 
             function showItems(x){
@@ -40,18 +39,18 @@
             .map(event => event.target.value)
             .skipDuplicates()
 
-            var suggestions = text.flatMapLatest(itemSearch);
+            var suggestions = text.flatMapLatest(itemSearch)
             suggestions.onValue(results => {
                 $("#content").html($.map(results, showItems))
-            });
+            })
 
             $("#input").trigger("keyup"); //Use properties?
 
             function ItemView(contentsProperty){
                 function updateContentView(newContents){
-                   $("#item-list").html($.map(newContents, showItems)); 
+                    $("#item-list").html($.map(newContents, showItems))
                 }
-                contentsProperty.onValue(updateContentView);
+                contentsProperty.onValue(updateContentView)
             }
 
             function spliced(l, index)
@@ -59,13 +58,19 @@
                 return l.slice(0, index).concat(l.slice(index+1)) 
             }
 
-            function ItemList(initialContents, addItem, removeItem){
+            function ItemList(initialContents, addItem, removeItem, submitList){
                 return Bacon.update(initialContents,
                     addItem, (contents, newItem) => contents.length < 6 ? contents.concat([newItem]) : contents,
-                    removeItem, (contents, removedItemIndex) => spliced(contents, removedItemIndex) 
+                    removeItem, (contents, removedItemIndex) => spliced(contents, removedItemIndex),
+                    submitList,  contents => { //side effects are bad :(
+                        console.log(contents)
+                        return contents
+                    }                        
                 )
             }
-            
+
+            var submitList = $("#submit-button").asEventStream("click")
+
             var removeItemStream = $("#item-list").asEventStream("click", "img").map(function(e){
                 return $(e.currentTarget).index()
             })
@@ -75,8 +80,9 @@
                 return [name, itemsJSON[name]]
             })
 
-            var itemList = ItemList([], newItemStream, removeItemStream)
+            var itemList = ItemList([], newItemStream, removeItemStream, submitList)
             var itemView = ItemView(itemList)
+            
         </script>
     </body>
 </html>
