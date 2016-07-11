@@ -5,13 +5,17 @@
         <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
     </head>
     <body>
-        <div id="item-list" style="height:64px"></div>
-        <button id="submit-button">Submit</button>
-        <input id="input" type="text">
-        <div id="content"></div>
-
+        <div class="container">
+            <div class="container" style="padding:20px; border: 1px solid; border-radius:16px">
+                <div id="item-list" style="height:100px; width:425px;" class="well"></div>
+                <a id="submit-button" href="#" class="btn btn-primary">Submit</a>
+            </div>
+            <input id="input" type="text" class="form-control">
+            <div id="content" class="well"></div>
+        </div>
         <script src=itemsJSON.js></script> <!-- Imports a json called itemsJSON -->
         <script type="text/babel">
         
@@ -29,6 +33,7 @@
                 var address = "http://ddragon.leagueoflegends.com/cdn/6.14.1/img/item/" + id + ".png";
                 return $("<img>", {
                     src: address,
+                    style: "cursor: pointer;",
                     //class: "itemImage",
                     title: name
                 });
@@ -82,7 +87,7 @@
 
             var itemList = ItemList([], newItemStream, removeItemStream, submitList)
             var itemView = ItemView(itemList)
-            
+
         </script>
     </body>
 </html>
