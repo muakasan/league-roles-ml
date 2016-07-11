@@ -8,6 +8,7 @@
     </head>
     <body>
         <input id="input" type="text">
+        <div id="item-list"></div>
         <div id="content">
             
         </div>
@@ -29,6 +30,7 @@
                 var address = "http://ddragon.leagueoflegends.com/cdn/6.14.1/img/item/" + id + ".png";
                 return $("<img>", {
                     src: address,
+                    //class: "itemImage",
                     title: name
                 });
             }
@@ -43,8 +45,36 @@
                 $("#content").html($.map(results, showItems))
             });
 
-            $("#input").trigger("keyup")
+            $("#input").trigger("keyup"); //Use properties?
 
+            function ItemView(contentsProperty){
+                function updateContentView(newContents){
+                   $("#itemsList").html($.map(newContents, showItems)); 
+                }
+                contentsProperty.onValue(updateContentView);
+            }
+            /*
+            function NewItemView(){
+                var newItemClick = $button.asEventStream("click");
+            */
+            function ItemList(initialContents, addItem, removeItem){
+                return Bacon.update(initialContents,
+                    addItem, (contents, newItem) => content.concat(newItem),
+                    removeItem, (contents, removedItemIndex) => contents.slice(removedItemIndex)
+                )
+            }
+            
+            var removeItemStream = $("#item-list").asEventStream("click", "img").map(function(e){
+                return $(e.currentTarget).attr("index")
+            })
+            
+            var newItemStream = $("#content").asEventStream("click", "img").map(function(e){
+                var name = $(e.currentTarget).attr("title")
+                return [name, itemsJSON[name]]
+            })
+
+            var itemList = ItemList([], newItemStream, removeItemStream)
+            var itemView = ItemView(itemList)
         </script>
     </body>
 </html>
